@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="llj_oss_migrate_wizard_form" model="ir.ui.view">
+        <field name="name">llj.oss.migrate.wizard.form</field>
+        <field name="model">llj.oss.migrate.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Migrate Filestore to OSS">
+                <sheet>
+                    <group invisible="state == 'done'">
+                        <p colspan="2">
+                            This will walk the local filestore and upload every
+                            file to Alibaba Cloud OSS under
+                            <code>[database]/[store_fname]</code>, preserving the
+                            current paths. Existing ir.attachment records keep
+                            their <code>store_fname</code> reference, which now
+                            resolves to the OSS object.
+                        </p>
+                        <field name="overwrite"/>
+                        <field name="enable_after"/>
+                    </group>
+                    <group invisible="state != 'done'">
+                        <field name="migrated_count"/>
+                        <field name="skipped_count"/>
+                        <field name="failed_count"/>
+                        <field name="log" nolabel="1" colspan="2"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_migrate" string="Migrate"
+                            type="object" class="btn-primary"
+                            invisible="state == 'done'"/>
+                    <button name="action_close" string="Close"
+                            type="object" class="btn-secondary"
+                            invisible="state != 'done'"/>
+                    <button string="Cancel" class="btn-secondary"
+                            special="cancel"
+                            invisible="state == 'done'"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="llj_oss_migrate_wizard_action" model="ir.actions.act_window">
+        <field name="name">Migrate Filestore to OSS</field>
+        <field name="res_model">llj.oss.migrate.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_llj_oss" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.llj.oss</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <!-- The base settings view is an empty <form> with js_class="base_settings".
+                 A standalone module (depending only on `base`) must add its own
+                 <app> block inside the <form> so it shows up as its own settings tab. -->
+            <xpath expr="//form" position="inside">
+                <app string="OSS Storage" name="llj_oss" data-string="OSS Storage">
+                    <block title="Alibaba Cloud OSS Storage" id="llj_oss_settings_block">
+                        <setting id="llj_oss_enabled_setting" string="Use Alibaba Cloud OSS"
+                                 help="Store attachment files on Alibaba Cloud OSS instead of the local filestore.">
+                            <field name="llj_oss_enabled"/>
+                        </setting>
+                        <setting id="llj_oss_access_key_setting" string="Access Key ID"
+                                 invisible="not llj_oss_enabled">
+                            <field name="llj_oss_access_key_id"/>
+                        </setting>
+                        <setting id="llj_oss_secret_setting" string="Access Key Secret"
+                                 invisible="not llj_oss_enabled">
+                            <field name="llj_oss_access_key_secret" password="True"/>
+                        </setting>
+                        <setting id="llj_oss_endpoint_setting" string="Endpoint"
+                                 invisible="not llj_oss_enabled">
+                            <field name="llj_oss_endpoint"
+                                   placeholder="https://oss-cn-hangzhou.aliyuncs.com"/>
+                        </setting>
+                        <setting id="llj_oss_bucket_setting" string="Bucket Name"
+                                 invisible="not llj_oss_enabled">
+                            <field name="llj_oss_bucket_name"/>
+                        </setting>
+                        <setting id="llj_oss_cdn_setting" string="CDN Domain (optional)"
+                                 invisible="not llj_oss_enabled">
+                            <field name="llj_oss_cdn_domain"
+                                   placeholder="https://cdn.example.com"/>
+                        </setting>
+                        <setting id="llj_oss_migrate_setting"
+                                 string="Migrate existing files"
+                                 invisible="not llj_oss_enabled"
+                                 help="Upload every file currently in the local filestore to OSS.">
+                            <button name="%(llj_oss_migrate_wizard_action)d"
+                                    string="Migrate Filestore to OSS"
+                                    type="action" class="btn-link"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>

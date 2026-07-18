@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ir_attachment_view_form_llj_oss" model="ir.ui.view">
+        <field name="name">ir.attachment.form.llj.oss</field>
+        <field name="model">ir.attachment</field>
+        <field name="inherit_id" ref="base.view_attachment_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='url']" position="after">
+                <field name="llj_oss_key" readonly="1" invisible="not llj_oss_key"/>
+                <field name="llj_oss_url" readonly="1" invisible="not llj_oss_url"
+                       widget="url"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

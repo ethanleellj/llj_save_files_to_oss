@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="product_template_form_llj_id_code" model="ir.ui.view">
+        <field name="name">product.template.form.llj.id.code</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <!-- Add the ID Code next to the Category field.
+                 In Odoo 19, default_code is added by an inherited view and
+                 may not be present in the base form, so we anchor on categ_id
+                 which is always rendered in the General Information tab. -->
+            <xpath expr="//field[@name='categ_id']" position="after">
+                <field name="llj_id_code" placeholder="e.g. SKU-001"/>
+            </xpath>
+
+            <!-- Add the original image field in the image section.
+                 Place it after the main image to allow users to upload original high-res. -->
+            <xpath expr="//field[@name='image_1920']" position="after">
+                <div class="o_form_image_controls mt-2" groups="base.group_user">
+                    <field name="llj_image_original" widget="image"
+                           class="oe_avatar"
+                           filename="llj_image_original_name"
+                           groups="base.group_user"/>
+                    <label for="llj_image_original_name" string="原始文件名"/>
+                    <field name="llj_image_original_name" class="oe_inline" readonly="1"/>
+                    <field name="llj_image_original_url" readonly="1" class="oe_inline"
+                           placeholder="OSS URL (保存后显示)"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="product_template_search_llj_id_code" model="ir.ui.view">
+        <field name="name">product.template.search.llj.id.code</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_search_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="llj_id_code"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
