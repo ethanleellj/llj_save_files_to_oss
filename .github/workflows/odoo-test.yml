@@ -1,0 +1,86 @@
+name: Odoo Module Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: odoo
+          POSTGRES_PASSWORD: odoo
+          POSTGRES_DB: odoo_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build Odoo Docker image
+      run: |
+        docker build -t odoo-llj-test .
+
+    - name: Install Odoo modules and run tests
+      run: |
+        docker run -d \
+          --name odoo-test \
+          --link postgres:db \
+          -p 8069:8069 \
+          -e HOST=db \
+          -e USER=odoo \
+          -e PASSWORD=odoo \
+          -e DB_NAME=odoo_test \
+          -v $(pwd)/llj_save_filestore_to_oss:/mnt/extra-addons/llj_save_filestore_to_oss \
+          -v $(pwd)/llj_save_product_file_with_id_code:/mnt/extra-addons/llj_save_product_file_with_id_code \
+          odoo-llj-test
+
+        sleep 60
+
+        curl -s http://localhost:8069/web/database/manager > /dev/null || (echo "Odoo not ready" && docker logs odoo-test && exit 1)
+
+        docker exec odoo-test odoo \
+          --addons-path=/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons \
+          --database=odoo_test \
+          --db_user=odoo \
+          --db_password=odoo \
+          --db_host=db \
+          --install=llj_save_filestore_to_oss,llj_save_product_file_with_id_code \
+          --stop-after-init
+
+        docker exec odoo-test python /mnt/extra-addons/tests/test_module.py \
+          --host=db \
+          --database=odoo_test \
+          --user=admin \
+          --password=admin
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: test-results.xml
+      if: failure()
+
+    - name: Show Odoo logs on failure
+      if: failure()
+      run: |
+        docker logs odoo-test
+
+    - name: Cleanup
+      if: always()
+      run: |
+        docker stop odoo-test || true
+        docker rm odoo-test || true
